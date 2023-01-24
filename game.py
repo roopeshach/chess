@@ -1,5 +1,7 @@
 from const import *
 import pygame
+from board import Board
+from PIL import Image
 
 class Game:
     """ 
@@ -8,7 +10,7 @@ class Game:
     """
 
     def __init__(self):
-        pass
+        self.board = Board()
 
 
     #show methods  to draw board and pieces
@@ -23,9 +25,9 @@ class Game:
             for col in range(COLS):
                 #alternate board colors
                 if (row + col) % 2 == 0:
-                    color = WHITE
+                    color = (234, 235,200)
                 else:
-                    color = BLACK
+                    color = (119, 154,88)
                 #draw square
                 rectangle = (row*SQSIZE, col*SQSIZE, SQSIZE, SQSIZE)
                 pygame.draw.rect(surface, color, rectangle)
@@ -33,7 +35,40 @@ class Game:
                 # pygame.draw.rect(surface, color, (row*SQSIZE, col*SQSIZE, SQSIZE, SQSIZE))
 
     def show_pieces(self, surface):
-        pass
+        """Draw the pieces on the board.
+        Args:
+            surface (pygame.Surface): The surface to draw on.
+        """
+        
+        for row in range(ROWS):
+            for col in range(COLS):
+                #check if square has a piece
+                if self.board.squares[row][col].has_piece():
+                    #get piece
+                    piece = self.board.squares[row][col].piece
+                   
+                    #draw piece
+                    # image = piece.texture
+                    # image_center  = col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2
+
+                    # piece.texture_rect = image.get_rect(center=image_center)    
+                    
+                    # create image from text and draw it
+                    font = pygame.font.SysFont('Monospace', 60)
+                    text = font.render(piece.texture, True, "black")
+                    text_rect = text.get_rect(center=(col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2))
+                    surface.blit(text, text_rect)
+
+
+
+                    
+
+
+
+
+
+
+        
 
     def show(self, surface):
         self.show_background(surface)

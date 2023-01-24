@@ -1,5 +1,7 @@
 from const import *
 from square import Square
+from piece import Piece, Pawn, Rook, Knight, Bishop, Queen, King
+
 
 class Board:
     """A chess board.
@@ -10,20 +12,19 @@ class Board:
 
 
     def __init__(self):
-        self.squares = []
+        self.squares = [[0, 0, 0, 0, 0, 0, 0, 0 ] for col in range(COLS)]
+
+        self._create()
+        self._add_pieces("white")
+        self._add_pieces("black")
+
 
     def _create(self):
         """Create the board."""
-        self.squares = [[0, 0, 0, 0, 0, 0, 0, 0 ] for col in range(COLS)]
-        # print(self.squares)
-
-        self._create()
-
-    
         for row in range(ROWS):
             for col in range(COLS):
                 self.squares[row][col] = Square(row, col)
-                print(self.squares[row][col])
+                # print(self.squares[row][col])
 
 
     def _add_pieces(self, color):
@@ -31,7 +32,36 @@ class Board:
         Args:
             color (str): The color of the pieces to add.
         """
-        pass
+        #black  must start from top 2 rows and white from bottom 2 rows
+
+        # if color == "black":
+        #     row = 0
+        # else:
+        #     row = 7
+
+        # if color.lower().strip()  == 'white':
+        #     row_pawn = 6
+        #     # row_piece = 7
+        #     row_other = 7
+        # else:
+        #     row_pawn = 1
+        #     # row_piece = 0
+        #     row_other = 0
+
+        row_pawn, row_other = (6, 7) if color == "white" else (1, 0)
+
+        #print pawns on the board
+        for col in range(COLS):
+            self.squares[row_pawn][col] = Square(row_pawn, col, Pawn(color))
+
+            # self.squares[row_piece][col].piece = Piece(color)
+
+        # print knights on the board
+        self.squares[row_other][1] = Square(row_other, 1, Knight(color))
+        self.squares[row_other][6] = Square(row_other, 6, Knight(color))
+
+
+
 
 
 

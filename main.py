@@ -25,7 +25,8 @@ class Main:
         
         while self.running:
             game.show_background(screen)
-            self.clock.tick(60)
+            game.show_pieces(screen)
+            # self.clock.tick(60)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False

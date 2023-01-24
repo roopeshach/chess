@@ -27,4 +27,9 @@ class Square:
         else:
             return False
         
+    def has_piece(self):
+        return self.piece != None
+    
+    def get_piece(self):
+        return self.piece
   
