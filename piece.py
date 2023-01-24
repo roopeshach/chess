@@ -8,6 +8,10 @@ class Piece:
         name (str): The name of the piece.
         color (str): The color of the piece.
         value (int): The value of the piece.
+        moves (list): A list of valid moves for the piece.
+        texture (str): The texture of the piece.
+        texture_rect (pygame.Rect): The rectangle of the texture.
+        
 
     
     """

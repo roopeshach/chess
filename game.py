@@ -25,9 +25,9 @@ class Game:
             for col in range(COLS):
                 #alternate board colors
                 if (row + col) % 2 == 0:
-                    color = (234, 235,200)
+                    color = DARK_BLUE
                 else:
-                    color = (119, 154,88)
+                    color = LIGHT_BLUE
                 #draw square
                 rectangle = (row*SQSIZE, col*SQSIZE, SQSIZE, SQSIZE)
                 pygame.draw.rect(surface, color, rectangle)

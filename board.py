@@ -60,6 +60,27 @@ class Board:
         self.squares[row_other][1] = Square(row_other, 1, Knight(color))
         self.squares[row_other][6] = Square(row_other, 6, Knight(color))
 
+        # print bishops on the board
+        self.squares[row_other][2] = Square(row_other, 2, Bishop(color))
+        self.squares[row_other][5] = Square(row_other, 5, Bishop(color))
+
+        # print rooks on the board
+        self.squares[row_other][0] = Square(row_other, 0, Rook(color))
+        self.squares[row_other][7] = Square(row_other, 7, Rook(color))
+
+        # print queen on the board
+        self.squares[row_other][3] = Square(row_other, 3, Queen(color))
+
+        # print king on the board
+        self.squares[row_other][4] = Square(row_other, 4, King(color))
+
+    def __str__(self):
+        """Return a string representation of the board."""
+        return f"Board({self.squares})"
+    
+    def __repr__(self):
+        """Return a string representation of the board."""
+        return f"Board({self.squares})"
 
 
 
