@@ -34,7 +34,7 @@ class Main:
 
             
 
-            pygame.display.flip()
+            # pygame.display.flip()
 
             pygame.display.update()
 
