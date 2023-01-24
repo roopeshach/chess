@@ -19,9 +19,12 @@ class Main:
 
 
     def mainloop(self):
+
+        screen = self.screen
+        game = self.game
         
         while self.running:
-            self.game.show_background(self.screen)
+            game.show_background(screen)
             self.clock.tick(60)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
