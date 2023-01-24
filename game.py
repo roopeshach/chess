@@ -2,6 +2,10 @@ from const import *
 import pygame
 
 class Game:
+    """ 
+    Game class to handle game logic and state.
+        
+    """
 
     def __init__(self):
         pass
@@ -10,6 +14,11 @@ class Game:
     #show methods  to draw board and pieces
 
     def show_background(self, surface):
+        """Draw the background of the board.
+        Args:
+            surface (pygame.Surface): The surface to draw on.
+        """
+        
         for row in range(ROWS):
             for col in range(COLS):
                 #alternate board colors
