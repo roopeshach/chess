@@ -12,7 +12,6 @@ class Game:
 
     def __init__(self):
         self.board = Board()
-
         self.dragger = Dragger()
 
     #show methods  to draw board and pieces
@@ -31,7 +30,7 @@ class Game:
                 else:
                     color = LIGHT_BLUE
                 #draw square
-                rectangle = (row*SQSIZE, col*SQSIZE, SQSIZE, SQSIZE)
+                rectangle = (col*SQSIZE, row*SQSIZE, SQSIZE, SQSIZE)
                 pygame.draw.rect(surface, color, rectangle)
                 
                 # pygame.draw.rect(surface, color, (row*SQSIZE, col*SQSIZE, SQSIZE, SQSIZE))
@@ -48,18 +47,15 @@ class Game:
                 if self.board.squares[row][col].has_piece():
                     #get piece
                     piece = self.board.squares[row][col].piece
-                   
-                    #draw piece
-                    image = pygame.image.load(piece.texture)
-                    image_center  = col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2
-                    piece.texture_rect = image.get_rect(center=image_center)    
-                    surface.blit(image, piece.texture_rect)
 
-                    # create image from text and draw it
-                    # font = pygame.font.SysFont('Monospace', 60)
-                    # text = font.render(piece.texture, True, "black")
-                    # text_rect = text.get_rect(center=(col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2))
-                    # surface.blit(text, text_rect)
+                    #all pieces except dragged piece
+                    if piece is not self.dragger.piece: 
+                        #draw piece
+                        piece.set_texture(size=80)
+                        image = pygame.image.load(piece.texture)
+                        image_center  = col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2
+                        piece.texture_rect = image.get_rect(center=image_center)    
+                        surface.blit(image, piece.texture_rect)
         
 
     def show(self, surface):

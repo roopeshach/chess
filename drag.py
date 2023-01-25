@@ -59,11 +59,33 @@ class Dragger:
         self.piece = None
         self.dragging = False
 
-    
+    #blit method
     def update_blit(self, surface):
         """Update the position of the piece being dragged.
         Args:
             surface (pygame.Surface): The surface to draw the piece on.
         """
-        pass
+        #texture 
+        self.piece.set_texture(size=120)
+        texture = self.piece.texture
+        #image 
+        image = pygame.image.load(texture)
+
+        #rectangles
+        image_center = (self.mouseX, self.mouseY)
+        self.piece.texture_rect = image.get_rect(center=image_center)
+
+        #blit
+        surface.blit(image, self.piece.texture_rect)
+
+    def update(self, surface):
+        """Update the position of the piece being dragged.
+        Args:
+            surface (pygame.Surface): The surface to draw the piece on.
+        """
+        if self.dragging:
+            self.update_blit(surface)
+
+# Path: game.py
+
     

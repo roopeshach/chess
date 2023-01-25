@@ -33,21 +33,6 @@ class Board:
             color (str): The color of the pieces to add.
         """
         #black  must start from top 2 rows and white from bottom 2 rows
-
-        # if color == "black":
-        #     row = 0
-        # else:
-        #     row = 7
-
-        # if color.lower().strip()  == 'white':
-        #     row_pawn = 6
-        #     # row_piece = 7
-        #     row_other = 7
-        # else:
-        #     row_pawn = 1
-        #     # row_piece = 0
-        #     row_other = 0
-
         row_pawn, row_other = (6, 7) if color == "white" else (1, 0)
 
         #print pawns on the board
@@ -74,13 +59,13 @@ class Board:
         # print king on the board
         self.squares[row_other][4] = Square(row_other, 4, King(color))
 
-    def __str__(self):
-        """Return a string representation of the board."""
-        return f"Board({self.squares})"
+    # def __str__(self):
+    #     """Return a string representation of the board."""
+    #     return f"Board({self.squares})"
     
-    def __repr__(self):
-        """Return a string representation of the board."""
-        return f"Board({self.squares})"
+    # def __repr__(self):
+    #     """Return a string representation of the board."""
+    #     return f"Board({self.squares})"
 
 
 
