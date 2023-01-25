@@ -2,6 +2,7 @@ from const import *
 import pygame
 from board import Board
 from PIL import Image
+from drag import Dragger
 
 class Game:
     """ 
@@ -12,6 +13,7 @@ class Game:
     def __init__(self):
         self.board = Board()
 
+        self.dragger = Dragger()
 
     #show methods  to draw board and pieces
 
@@ -48,26 +50,16 @@ class Game:
                     piece = self.board.squares[row][col].piece
                    
                     #draw piece
-                    # image = piece.texture
-                    # image_center  = col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2
+                    image = pygame.image.load(piece.texture)
+                    image_center  = col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2
+                    piece.texture_rect = image.get_rect(center=image_center)    
+                    surface.blit(image, piece.texture_rect)
 
-                    # piece.texture_rect = image.get_rect(center=image_center)    
-                    
                     # create image from text and draw it
-                    font = pygame.font.SysFont('Monospace', 60)
-                    text = font.render(piece.texture, True, "black")
-                    text_rect = text.get_rect(center=(col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2))
-                    surface.blit(text, text_rect)
-
-
-
-                    
-
-
-
-
-
-
+                    # font = pygame.font.SysFont('Monospace', 60)
+                    # text = font.render(piece.texture, True, "black")
+                    # text_rect = text.get_rect(center=(col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2))
+                    # surface.blit(text, text_rect)
         
 
     def show(self, surface):

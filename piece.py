@@ -1,4 +1,6 @@
 import math
+import os
+import pygame
 
 class Piece:
     """
@@ -11,12 +13,12 @@ class Piece:
         moves (list): A list of valid moves for the piece.
         texture (str): The texture of the piece.
         texture_rect (pygame.Rect): The rectangle of the texture.
-        
+
 
     
     """
     
-    def __init__(self,name, color, value, texture, texture_rect=None):
+    def __init__(self,name, color, value, texture=None, texture_rect=None):
         self.name = name
         self.color = color
         value_sign = 1 if color == "white" else -1
@@ -24,20 +26,19 @@ class Piece:
 
         #store all possible valid moves for the piece
         self.moves = []
-
+        self.moved = False
         # overlay texture image on top of the piece 
         self.texture = texture
+        self.set_texture()
         self.texture_rect = texture_rect
 
 
 
-    def set_texture(self, char):
-        # will be used to set the texture of the piece
-        # will add later when i will find proper images
-        #display initials of the piece on top of the square
-        
-        self.texture = char
-
+    def set_texture(self, size=80):
+        # render pieces images respectively
+        self.texture = os.path.join(f"assets/images/{size}px/{self.color}_{self.name}_{size}.png")
+        # print(self.texture)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
     def __str__(self):
         return f"{self.color} {self.name}"
 
@@ -59,7 +60,7 @@ class Pawn(Piece):
     """ 
     def __init__(self, color):
         self.dir = -1 if color == "white" else 1
-        super().__init__("pawn", color, 1, "P")
+        super().__init__("pawn", color, 1)
     
     def get_moves(self):
         pass
@@ -75,7 +76,7 @@ class Rook(Piece):
 
 
     def __init__(self, color):
-        super().__init__("rook", color, 5, "R")
+        super().__init__("rook", color, 5)
     
     def get_moves(self):
         pass
@@ -91,7 +92,7 @@ class Knight(Piece):
 
     """
     def __init__(self, color):
-        super().__init__("knight", color, 3, "K")
+        super().__init__("knight", color, 3)
     
     def get_moves(self):
         pass
@@ -100,7 +101,7 @@ class Knight(Piece):
 class Bishop(Piece):
     """A class to represent a bishop."""
     def __init__(self, color):
-            super().__init__("bishop", color, 3.001, "B")
+            super().__init__("bishop", color, 3.001)
         
     def get_moves(self):
         pass
@@ -110,7 +111,7 @@ class Queen(Piece):
 
     """A class to represent a queen."""
     def __init__(self, color):
-        super().__init__("queen", color, 9, "Q")
+        super().__init__("queen", color, 9)
     
     def get_moves(self):
         pass
@@ -118,7 +119,7 @@ class Queen(Piece):
 class King(Piece):
     """A class to represent a king."""
     def __init__(self, color):
-        super().__init__("king", color, math.inf, "K")
+        super().__init__("king", color, math.inf)
     
     def get_moves(self):
         pass
