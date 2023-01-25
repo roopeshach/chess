@@ -62,12 +62,16 @@ class Game:
         self.show_background(surface)
         self.show_pieces(surface)
 
-    #update methods to update board and pieces
+    
+    def show_moves(self, surface):
+        if self.dragger.dragging:
+            piece = self.dragger.piece
 
-    def update_background(self):
-        pass
+            #loop through all valid moves
+            for move in piece.moves:
+                #color of move
+                color = LIGHT_GREEN if (move.final.row + move.final.col) % 2 == 0 else DARK_GREEN
+                rect = (move.final.col*SQSIZE, move.final.row*SQSIZE, SQSIZE, SQSIZE)
 
-    def update_pieces(self):
-        pass
-
-
+                #draw move / blit
+                pygame.draw.rect(surface, color, rect)

@@ -22,6 +22,9 @@ LIGHT_RED = (214, 133, 124)
 DARK_BLUE = (27, 70, 179)
 LIGHT_BLUE = (126, 155, 230)
 
+DARK_GREEN = (81, 138, 76)
+LIGHT_GREEN = (197, 250, 192)
+
 #dimensions for pieces
 RADIUS = SQSIZE//2 - 10
 

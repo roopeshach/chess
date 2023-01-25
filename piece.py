@@ -45,7 +45,7 @@ class Piece:
     def get_moves(self):
         pass
     
-    def add_moves(self, move):
+    def add_move(self, move):
         self.moves.append(move)
 
 

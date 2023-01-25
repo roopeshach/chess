@@ -1,7 +1,7 @@
 from const import *
 from square import Square
 from piece import Piece, Pawn, Rook, Knight, Bishop, Queen, King
-
+from move import Move
 
 class Board:
     """A chess board.
@@ -28,7 +28,10 @@ class Board:
 
 
     def _add_pieces(self, color):
-        """Add pieces to the board. 
+        """Add pieces to the board.     image = pygame.image.load(piece.texture)
+                        image_center  = col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2
+                        piece.texture_rect = image.get_rect(center=image_center)    
+                        surface.blit(image, piece.texture_rect)
         Args:
             color (str): The color of the pieces to add.
         """
@@ -44,6 +47,8 @@ class Board:
         # print knights on the board
         self.squares[row_other][1] = Square(row_other, 1, Knight(color))
         self.squares[row_other][6] = Square(row_other, 6, Knight(color))
+
+        # self.squares[4][4] = Square(4, 4, Knight("white"))
 
         # print bishops on the board
         self.squares[row_other][2] = Square(row_other, 2, Bishop(color))
@@ -68,7 +73,60 @@ class Board:
     #     return f"Board({self.squares})"
 
 
+    def calc_moves(self, piece, row, col):
+        '''
+        Calculate the possible moves for a piece in specific square
+        
+        '''
+ 
+        def knight_moves():
 
+            possible_moves = [
+                (row-2, col + 1),
+                (row -1 , col + 2),
+                (row + 1, col + 2),
+                (row + 2, col + 1),
+                (row + 2, col - 1),
+                (row + 1, col - 2),
+                (row - 1, col - 2),
+                (row - 2, col - 1)
+            ]
+
+            for possible_move in possible_moves:
+                possible_move_row, possible_move_col = possible_move
+                if Square.in_range(possible_move_row, possible_move_col):
+                    if self.squares[possible_move_row][possible_move_col].isempty_or_rival(piece.color):
+                        #creating square for new move
+                        initial = Square(row, col)
+                        final = Square(possible_move_row, possible_move_col) #piece = piece
+
+                        #creating new move
+                        move = Move(initial, final)
+
+                        #append new valid move    
+                        piece.add_move(move)
+
+        def pawn_moves():
+            #steps 
+            steps = 1 if piece.moved else 2
+            
+            # vertical moves / eating pieces moves
+            start = row + piece.dir
+            end = row + (piece.dir * (1 + steps))
+
+            for move_row in range(start, end, piece.dir):
+                pass
+
+
+
+
+        if isinstance(piece, Pawn):pawn_moves()
+        elif isinstance( piece, Rook):pass
+        elif isinstance(piece, Knight): knight_moves()
+        elif isinstance(piece, Bishop):pass
+        elif isinstance(piece, Queen): pass
+        elif isinstance(piece, King):pass
+        else: raise ValueError("Invalid piece")
 
 
 b = Board()
