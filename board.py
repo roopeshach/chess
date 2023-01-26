@@ -67,7 +67,7 @@ class Board:
 
         # print king on the board
         self.squares[row_other][4] = Square(row_other, 4, King(color))
-
+        self.squares[3][4] = Square(3, 4, King('black'))
     # def __str__(self):
     #     """Return a string representation of the board."""
     #     return f"Board({self.squares})"
@@ -188,6 +188,38 @@ class Board:
                     #out of range
                     else: break
 
+        def king_moves():
+            adjacents = [
+                (row - 1, col + 0), # up
+                (row - 1, col + 1), # up-right
+                (row + 0, col + 1), # right
+                (row + 1, col + 1), # down-right
+                 (row + 1, col + 0), # down
+                (row + 1, col - 1), # down-left
+                (row + 0, col - 1), # left
+                (row - 1, col - 1), # up-left
+            ]
+
+            for possible_move in adjacents:
+                possible_move_row, possible_move_col = possible_move
+                if Square.in_range(possible_move_row, possible_move_col):
+                    if self.squares[possible_move_row][possible_move_col].isempty_or_enemy(piece.color):
+                        #creating square for new move
+                        initial = Square(row, col)
+                        final = Square(possible_move_row, possible_move_col)
+
+                        #creating new move
+                        move = Move(initial, final)
+
+                        #append new valid move
+                        piece.add_move(move)
+
+            #castling moves
+            
+            #king side
+
+            #queen side
+
         if isinstance(piece, Pawn):pawn_moves()
         elif isinstance(piece, Knight): knight_moves()
         elif isinstance(piece, Bishop):straightline_moves([
@@ -214,7 +246,7 @@ class Board:
                 (0, -1), #left
                 
         ])
-        elif isinstance(piece, King):pass
+        elif isinstance(piece, King):king_moves()
         else: raise ValueError("Invalid piece")
 
 
