@@ -14,6 +14,7 @@ class Board:
     def __init__(self):
         self.squares = [[0, 0, 0, 0, 0, 0, 0, 0 ] for col in range(COLS)]
 
+        self.last_move = None
         self._create()
         self._add_pieces("white")
         self._add_pieces("black")
@@ -28,10 +29,7 @@ class Board:
 
 
     def _add_pieces(self, color):
-        """Add pieces to the board.     image = pygame.image.load(piece.texture)
-                        image_center  = col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2
-                        piece.texture_rect = image.get_rect(center=image_center)    
-                        surface.blit(image, piece.texture_rect)
+        """Add pieces to the board.     
         Args:
             color (str): The color of the pieces to add.
         """
@@ -76,6 +74,7 @@ class Board:
     #     """Return a string representation of the board."""
     #     return f"Board({self.squares})"
 
+    
 
     def calc_moves(self, piece, row, col):
         '''
@@ -248,6 +247,29 @@ class Board:
         ])
         elif isinstance(piece, King):king_moves()
         else: raise ValueError("Invalid piece")
+
+
+    def move(self, piece, move):
+        initial = move.initial
+        final = move.final
+
+        #console board move update
+        self.squares[initial.row][initial.col].piece = None
+        #moving piece
+        self.squares[final.row][final.col].piece = piece
+
+        piece.moved = True
+
+        #clear valid moves
+        piece.clear_moves()
+
+        #set last move
+        self.last_move = move
+
+        
+
+    def valid_move(self, piece, move):
+        return move in piece.moves
 
 
 b = Board()
