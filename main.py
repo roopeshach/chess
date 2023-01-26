@@ -29,6 +29,7 @@ class Main:
         while self.running:
             #show methods
             game.show_background(screen)
+            game.show_last_moves(screen)
             game.show_moves(screen)
             
             game.show_pieces(screen)
@@ -58,6 +59,7 @@ class Main:
 
                             #show methods
                             game.show_background(screen)
+                            game.show_last_moves(screen)
                             game.show_moves(screen)
                             game.show_pieces(screen)
 
@@ -68,11 +70,12 @@ class Main:
                         dragger.update_mouse(event.pos)
                         #show methods
                         game.show_background(screen)
+                        game.show_last_moves(screen)
                         game.show_moves(screen)
                         game.show_pieces(screen)
                         dragger.update_blit(screen)
 
-                #mouse button up / drop / leave
+                #mouse button up / drop / leave /release
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if dragger.dragging:
                         dragger.update_mouse(event.pos)
@@ -92,6 +95,7 @@ class Main:
                             
                             #show methods
                             game.show_background(screen)
+                            game.show_last_moves(screen)
                             game.show_pieces(screen)
 
                             #change player turn
@@ -120,12 +124,6 @@ class Main:
                 #key up
                 elif event.type == pygame.KEYUP:
                     pass
-
-            
-
-            
-
-            # pygame.display.flip()
 
             pygame.display.update()
 

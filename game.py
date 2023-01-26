@@ -82,3 +82,16 @@ class Game:
         print(self.next_player)
 
         
+    def show_last_moves(self, surface):
+        if self.board.last_move:
+            initial = self.board.last_move.initial
+            final = self.board.last_move.final
+
+            for pos in [initial , final]:
+                 #color of move
+                color = (228, 245, 154) if (pos.row + pos.col) % 2 == 0 else (236, 247, 186)
+                rect = (pos.col*SQSIZE, pos.row*SQSIZE, SQSIZE, SQSIZE)
+
+                #draw move / blit
+                pygame.draw.rect(surface, color, rect)
+

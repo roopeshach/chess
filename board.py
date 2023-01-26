@@ -40,39 +40,31 @@ class Board:
         for col in range(COLS):
             self.squares[row_pawn][col] = Square(row_pawn, col, Pawn(color))
 
-        self.squares[5][1] = Square(4, 0, Pawn("black"))
-            # self.squares[row_piece][col].piece = Piece(color)
-
         # print knights on the board
         self.squares[row_other][1] = Square(row_other, 1, Knight(color))
         self.squares[row_other][6] = Square(row_other, 6, Knight(color))
 
-        # self.squares[4][4] = Square(4, 4, Knight("white"))
-
         # print bishops on the board
         self.squares[row_other][2] = Square(row_other, 2, Bishop(color))
         self.squares[row_other][5] = Square(row_other, 5, Bishop(color))
-        self.squares[4][4] = Square(4, 4, Bishop("black"))
 
         # print rooks on the board
         self.squares[row_other][0] = Square(row_other, 0, Rook(color))
         self.squares[row_other][7] = Square(row_other, 7, Rook(color))
-        self.squares[3][3] = Square(43, 3, Rook("black"))
 
         # print queen on the board
         self.squares[row_other][3] = Square(row_other, 3, Queen(color))
-        self.squares[2][3] = Square(2, 3, Queen("white"))
 
         # print king on the board
         self.squares[row_other][4] = Square(row_other, 4, King(color))
-        self.squares[3][4] = Square(3, 4, King('black'))
-    # def __str__(self):
-    #     """Return a string representation of the board."""
-    #     return f"Board({self.squares})"
     
-    # def __repr__(self):
-    #     """Return a string representation of the board."""
-    #     return f"Board({self.squares})"
+    def __str__(self):
+        """Return a string representation of the board."""
+        return f"Board({self.squares})"
+    
+    def __repr__(self):
+        """Return a string representation of the board."""
+        return f"Board({self.squares})"
 
     
 
