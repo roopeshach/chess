@@ -11,6 +11,7 @@ class Game:
     """
 
     def __init__(self):
+        self.next_player = 'white'
         self.board = Board()
         self.dragger = Dragger()
 
@@ -33,7 +34,6 @@ class Game:
                 rectangle = (col*SQSIZE, row*SQSIZE, SQSIZE, SQSIZE)
                 pygame.draw.rect(surface, color, rectangle)
                 
-                # pygame.draw.rect(surface, color, (row*SQSIZE, col*SQSIZE, SQSIZE, SQSIZE))
 
     def show_pieces(self, surface):
         """Draw the pieces on the board.
@@ -75,3 +75,10 @@ class Game:
 
                 #draw move / blit
                 pygame.draw.rect(surface, color, rect)
+    
+    def next_turn(self):
+        """Change the current player."""
+        self.next_player = 'white' if self.next_player == 'black' else 'black'
+        print(self.next_player)
+
+        

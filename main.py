@@ -47,16 +47,19 @@ class Main:
                     clicked_col = dragger.mouseX // SQSIZE
 
                     if board.squares[clicked_row][clicked_col].has_piece():
-                        print("has piece")
+                        # print("has piece")
                         piece = board.squares[clicked_row][clicked_col].piece
-                        board.calc_moves(piece, clicked_row, clicked_col)
-                        dragger.save_initial(event.pos)
-                        dragger.drag_piece(piece)
 
-                        #show methods
-                        game.show_background(screen)
-                        game.show_moves(screen)
-                        game.show_pieces(screen)
+                        # valid piece color ? /find next player turn
+                        if piece.color == game.next_player:
+                            board.calc_moves(piece, clicked_row, clicked_col)
+                            dragger.save_initial(event.pos)
+                            dragger.drag_piece(piece)
+
+                            #show methods
+                            game.show_background(screen)
+                            game.show_moves(screen)
+                            game.show_pieces(screen)
 
 
                 #mouse motion / drag
@@ -90,6 +93,9 @@ class Main:
                             #show methods
                             game.show_background(screen)
                             game.show_pieces(screen)
+
+                            #change player turn
+                            game.next_turn()
 
                         dragger.update_blit(screen)
 

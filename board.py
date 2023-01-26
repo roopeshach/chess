@@ -266,8 +266,6 @@ class Board:
         #set last move
         self.last_move = move
 
-        
-
     def valid_move(self, piece, move):
         return move in piece.moves
 
