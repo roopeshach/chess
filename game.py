@@ -12,6 +12,7 @@ class Game:
 
     def __init__(self):
         self.next_player = 'white'
+        self.hovered_square = None
         self.board = Board()
         self.dragger = Dragger()
 
@@ -95,3 +96,11 @@ class Game:
                 #draw move / blit
                 pygame.draw.rect(surface, color, rect)
 
+    def set_hover(self, row, col):
+        self.hovered_square = self.board.squares[row][col]
+
+    def show_hover(self, surface):
+        if self.hovered_square:
+            color = (180, 180, 180)
+            rect = (self.hovered_square.col*SQSIZE, self.hovered_square.row*SQSIZE, SQSIZE, SQSIZE)
+            pygame.draw.rect(surface, color, rect, width=2)
