@@ -121,6 +121,8 @@ class Queen(Piece):
 class King(Piece):
     """A class to represent a king."""
     def __init__(self, color):
+        self.left_rook = None
+        self.right_rook = None
         super().__init__("king", color, math.inf)
     
     def get_moves(self):
