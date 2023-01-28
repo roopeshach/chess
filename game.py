@@ -3,7 +3,7 @@ import pygame
 from board import Board
 from PIL import Image
 from drag import Dragger
-
+from config import Config
 class Game:
     """ 
     Game class to handle game logic and state.
@@ -15,6 +15,7 @@ class Game:
         self.hovered_square = None
         self.board = Board()
         self.dragger = Dragger()
+        self.config = Config()
 
     #show methods  to draw board and pieces
 
@@ -23,14 +24,17 @@ class Game:
         Args:
             surface (pygame.Surface): The surface to draw on.
         """
-        
+        theme = self.config.theme
+
         for row in range(ROWS):
             for col in range(COLS):
+                #color 
+                color = theme.bg.light if (row + col) % 2 == 0 else theme.bg.dark
                 #alternate board colors
-                if (row + col) % 2 == 0:
-                    color = DARK_BLUE
-                else:
-                    color = LIGHT_BLUE
+                # if (row + col) % 2 == 0:
+                #     color = DARK_BLUE
+                # else:
+                #     color = LIGHT_BLUE
                 #draw square
                 rectangle = (col*SQSIZE, row*SQSIZE, SQSIZE, SQSIZE)
                 pygame.draw.rect(surface, color, rectangle)
@@ -65,12 +69,15 @@ class Game:
 
     
     def show_moves(self, surface):
+        theme = self.config.theme
         if self.dragger.dragging:
             piece = self.dragger.piece
 
             #loop through all valid moves
             for move in piece.moves:
                 #color of move
+                color = theme.moves.light if (move.final.row + move.final.col) % 2 == 0 else theme.moves.dark
+
                 color = LIGHT_GREEN if (move.final.row + move.final.col) % 2 == 0 else DARK_GREEN
                 rect = (move.final.col*SQSIZE, move.final.row*SQSIZE, SQSIZE, SQSIZE)
 
@@ -84,12 +91,14 @@ class Game:
 
         
     def show_last_moves(self, surface):
+        theme = self.config.theme
         if self.board.last_move:
             initial = self.board.last_move.initial
             final = self.board.last_move.final
 
             for pos in [initial , final]:
-                 #color of move
+                color = theme.trace.light if (pos.row + pos.col) % 2 == 0 else theme.trace.dark
+                #color of move
                 color = (228, 245, 154) if (pos.row + pos.col) % 2 == 0 else (236, 247, 186)
                 rect = (pos.col*SQSIZE, pos.row*SQSIZE, SQSIZE, SQSIZE)
 
@@ -104,3 +113,12 @@ class Game:
             color = (180, 180, 180)
             rect = (self.hovered_square.col*SQSIZE, self.hovered_square.row*SQSIZE, SQSIZE, SQSIZE)
             pygame.draw.rect(surface, color, rect, width=2)
+    
+    def change_theme(self):
+        self.config.change_theme()
+
+    def play_sound(self, captured=False):
+        if captured:
+            self.config.capture_sound.play_sound()
+        else:
+            self.config.move_sound.play_sound()        

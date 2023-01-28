@@ -100,8 +100,11 @@ class Main:
                         #check if move is valid
                         if board.valid_move(dragger.piece, move):
                             print("valid move")
+
+                            captured = board.squares[released_row][released_col].has_piece()
+
                             board.move(dragger.piece, move)
-                            
+                            game.play_sound(captured)
                             #show methods
                             game.show_background(screen)
                             game.show_last_moves(screen)
@@ -128,7 +131,10 @@ class Main:
 
                 #key down
                 elif event.type == pygame.KEYDOWN:
-                    pass
+                     if event.key == pygame.K_t:
+                        
+                        game.change_theme()
+
 
                 #key up
                 elif event.type == pygame.KEYUP:
