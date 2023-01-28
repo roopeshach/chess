@@ -131,11 +131,17 @@ class Main:
 
                 #key down
                 elif event.type == pygame.KEYDOWN:
-                     if event.key == pygame.K_t:
+
+                    if event.key == pygame.K_t:
                         
                         game.change_theme()
-
-
+                    if event.key == pygame.K_r:
+                        
+                        game.reset()
+                        screen = self.screen
+                        game = self.game
+                        board = self.game.board
+                        dragger = self.game.dragger
                 #key up
                 elif event.type == pygame.KEYUP:
                     pass

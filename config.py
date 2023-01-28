@@ -1,6 +1,8 @@
 from sound import Sound
 import os
+import pygame
 from theme import Theme
+
 class Config:
     def __init__(self):
         self.themes = []
@@ -8,7 +10,10 @@ class Config:
         self.idx  = 0
         self.theme = self.themes[self.idx]
 
-        #font 
+        #font
+        self.font = pygame.font.SysFont('monospace', 20, bold=True) 
+
+        #sound 
         self.move_sound = Sound(
             os.path.join("assets/sounds/move.wav")
         )

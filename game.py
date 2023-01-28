@@ -4,6 +4,7 @@ from board import Board
 from PIL import Image
 from drag import Dragger
 from config import Config
+from square import Square
 class Game:
     """ 
     Game class to handle game logic and state.
@@ -38,6 +39,22 @@ class Game:
                 #draw square
                 rectangle = (col*SQSIZE, row*SQSIZE, SQSIZE, SQSIZE)
                 pygame.draw.rect(surface, color, rectangle)
+                
+                #row coordinates
+                if col == 0:
+                    color = theme.bg.dark if (row ) % 2 == 0 else theme.bg.light
+                    #label 
+                    label = self.config.font.render(Square.get_alpha_col(col), 1, color)
+                    label_pos = (col * SQSIZE + SQSIZE -20 , HEIGHT -20)
+                    surface.blit(label, label_pos)
+
+                #col coordinates
+                if row == ROWS - 1:
+                    color = theme.bg.dark if (row + col) % 2 == 0 else theme.bg.light
+                    #label 
+                    label = self.config.font.render(chr(65+col), 1, color)
+                    label_pos = (5 + col * SQSIZE, 5 + row * SQSIZE)
+                    surface.blit(label, label_pos)
                 
 
     def show_pieces(self, surface):
@@ -121,4 +138,7 @@ class Game:
         if captured:
             self.config.capture_sound.play_sound()
         else:
-            self.config.move_sound.play_sound()        
+            self.config.move_sound.play_sound()     
+
+    def reset(self):
+        self.__init__()
