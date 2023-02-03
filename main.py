@@ -99,11 +99,14 @@ class Main:
 
                         #check if move is valid
                         if board.valid_move(dragger.piece, move):
-                            print("valid move")
-
+                            # print("valid move")
+                            #normal capture
                             captured = board.squares[released_row][released_col].has_piece()
-
                             board.move(dragger.piece, move)
+
+                            board.set_true_enpassant(dragger.piece)
+
+
                             game.play_sound(captured)
                             #show methods
                             game.show_background(screen)
