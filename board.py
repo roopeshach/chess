@@ -138,7 +138,6 @@ class Board:
                         else:
                             #append new valid move
                             # piece.add_move(move)
-
                             #check potiential check move
                             if bool:
                                 if not self.in_check(piece, move):
@@ -148,7 +147,6 @@ class Board:
                             else:
                                 #append new valid move
                                 piece.add_move(move)
-                            
 
                         #append new valid move
                         # piece.add_move(move)
@@ -173,6 +171,35 @@ class Board:
                         #append new valid move
                         piece.add_move(move)
 
+            #en passant moves
+            r = 3 if piece.color == 'white' else 4
+            fr = 2 if piece.color == 'white' else 5
+            #left enpassant
+            if Square.in_range(col - 1 ) and row == r:
+                if self.squares[row][col-1].has_enemy_piece(piece.color):
+                    p = self.squares[row][col-1].piece
+                    if isinstance(p, Pawn):
+                        if p.en_passant:
+                            #creating square for new move
+                            initial = Square(row, col)
+                            final = Square(fr, col-1, p)
+                            #creating new move
+                            move = Move(initial, final)
+                            #append new valid move
+                            if bool:
+                                if not self.in_check(piece, move):
+                                    #append new valid move
+                                    piece.add_move(move)
+                            else:
+                                #append new valid move
+                                piece.add_move(move)
+
+                    
+
+
+
+
+            #right enpassant
         def straightline_moves(increments):
             for increment in increments:
                 row_increment, col_increment = increment
@@ -388,9 +415,18 @@ class Board:
         #moving piece
         self.squares[final.row][final.col].piece = piece
 
+        
+
         #pawn promotion
         if isinstance(piece, Pawn):
-            self.check_promotion(piece, final)
+            #pawn enpassant
+            if self.enpassant(initial, final):
+                piece.en_passant = True
+                # print('pawn moved 2 squares')
+
+            else:
+                self.check_promotion(piece, final)
+
         
         #king castling
         if isinstance(piece, King):
@@ -413,6 +449,9 @@ class Board:
     
     def castling(self, initial, final):
         return abs(initial.col - final.col) == 2
+    
+    def enpassant(self, initial, final):
+        return abs(initial.row - final.row) == 2
     
     def in_check(self, piece, move):
         temp_piece = copy.deepcopy(piece)
