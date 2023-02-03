@@ -54,7 +54,7 @@ class Main:
 
                         # valid piece color ? /find next player turn
                         if piece.color == game.next_player:
-                            board.calc_moves(piece, clicked_row, clicked_col)
+                            board.calc_moves(piece, clicked_row, clicked_col, bool=True)
                             dragger.save_initial(event.pos)
                             dragger.drag_piece(piece)
 
@@ -142,6 +142,11 @@ class Main:
                         game = self.game
                         board = self.game.board
                         dragger = self.game.dragger
+
+                    if event.key == pygame.K_q:
+                        self.running = False
+                        pygame.quit()
+                        sys.exit()
                 #key up
                 elif event.type == pygame.KEYUP:
                     pass
