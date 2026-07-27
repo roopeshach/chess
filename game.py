@@ -17,6 +17,7 @@ class Game:
         self.board = Board()
         self.dragger = Dragger()
         self.config = Config()
+        self.move_history = []
 
     #show methods  to draw board and pieces
 
@@ -100,7 +101,6 @@ class Game:
     def next_turn(self):
         """Change the current player."""
         self.next_player = 'white' if self.next_player == 'black' else 'black'
-        print(self.next_player)
 
         
     def show_last_moves(self, surface):
@@ -136,6 +136,22 @@ class Game:
 
     def reset(self):
         self.__init__()
+
+    def apply_move(self, piece, move, player):
+        captured = self.board.squares[move.final.row][move.final.col].has_piece()
+        self.board.move(piece, move)
+        self.board.set_true_enpassant(piece)
+        self.move_history.append(
+            {
+                "player": player,
+                "piece": piece.name,
+                "notation": move.notation(),
+                "captured": captured,
+            }
+        )
+        self.play_sound(captured)
+        self.next_turn()
+        return captured
 
     def render(self, surface):
         self.show_background(surface)

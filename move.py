@@ -24,6 +24,9 @@ class Move:
         s += f' -> ({self.final.col}, {self.final.row})'
         return s
 
+    def notation(self):
+        return f"{self.initial.alphacol}{8 - self.initial.row}{self.final.alphacol}{8 - self.final.row}"
+
     def __eq__(self, other):
         """Overrides the default implementation"""
 
