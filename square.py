@@ -9,17 +9,7 @@ class Square:
         piece (Piece): The piece on the square.
     """
 
-    ALPHACOLS = {
-        0: "a", 
-        1: "b",
-        2: "c",
-        3: "d",
-        4: "e",
-        5: "f",
-        6: "g",
-        7: "h"
-
-    }
+    ALPHACOLS = ("a", "b", "c", "d", "e", "f", "g", "h")
 
     def __init__(self, row, col, piece=None):
         self.row = row
@@ -28,9 +18,11 @@ class Square:
         self.alphacol = Square.ALPHACOLS[col]
 
     def has_piece(self):
-        return self.piece != None
+        return self.piece is not None
     
     def __eq__(self, other):
+        if not isinstance(other, Square):
+            return False
         return self.row == other.row and self.col == other.col
     
     def is_empty(self):
@@ -54,18 +46,7 @@ class Square:
     
     @staticmethod
     def get_alpha_col(col):
-        ALPHACOLS = {
-        0: "a", 
-        1: "b",
-        2: "c",
-        3: "d",
-        4: "e",
-        5: "f",
-        6: "g",
-        7: "h"
-
-        }
-        return ALPHACOLS[col]
+        return Square.ALPHACOLS[col]
 
 
 # print(Square.in_range(5, 2, 5, 3))

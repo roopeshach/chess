@@ -1,6 +1,5 @@
 import math
 import os
-import pygame
 
 class Piece:
     """
@@ -128,5 +127,4 @@ class King(Piece):
     
     def get_moves(self):
         pass
-
 

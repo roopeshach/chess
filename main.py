@@ -25,15 +25,8 @@ class Main:
         board = self.game.board
         dragger = self.game.dragger
 
-
         while self.running:
-            #show methods
-            game.show_background(screen)
-            game.show_last_moves(screen)
-            game.show_moves(screen)
-            
-            game.show_pieces(screen)
-            game.show_hover(screen)
+            game.render(screen)
 
             if dragger.dragging:
                 dragger.update_blit(screen)
@@ -58,13 +51,7 @@ class Main:
                             dragger.save_initial(event.pos)
                             dragger.drag_piece(piece)
 
-                            #show methods
-                            game.show_background(screen)
-                            game.show_last_moves(screen)
-                            game.show_moves(screen)
-                            game.show_pieces(screen)
-
-                            game.show_hover(screen)
+                            game.render(screen)
 
 
                 #mouse motion / drag
@@ -76,12 +63,7 @@ class Main:
 
                     if dragger.dragging:
                         dragger.update_mouse(event.pos)
-                        #show methods
-                        game.show_background(screen)
-                        game.show_last_moves(screen)
-                        game.show_moves(screen)
-                        game.show_pieces(screen)
-                        game.show_hover(screen)
+                        game.render(screen)
                         dragger.update_blit(screen)
 
                 #mouse button up / drop / leave /release
@@ -108,10 +90,7 @@ class Main:
 
 
                             game.play_sound(captured)
-                            #show methods
-                            game.show_background(screen)
-                            game.show_last_moves(screen)
-                            game.show_pieces(screen)
+                            game.render(screen)
 
                             #change player turn
                             game.next_turn()
@@ -126,9 +105,7 @@ class Main:
 
                 #quit game
                 elif event.type == pygame.QUIT:
-                    self.running = False
-                    pygame.quit()
-                    sys.exit()
+                    self.quit()
 
                 #keyboard events
 
@@ -147,14 +124,17 @@ class Main:
                         dragger = self.game.dragger
 
                     if event.key == pygame.K_q:
-                        self.running = False
-                        pygame.quit()
-                        sys.exit()
+                        self.quit()
                 #key up
                 elif event.type == pygame.KEYUP:
                     pass
 
             pygame.display.update()
+
+    def quit(self):
+        self.running = False
+        pygame.quit()
+        sys.exit()
 
 
 main = Main()

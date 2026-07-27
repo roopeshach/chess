@@ -1,10 +1,10 @@
 from const import *
 import pygame
 from board import Board
-from PIL import Image
 from drag import Dragger
 from config import Config
 from square import Square
+from asset_cache import asset_cache, piece_texture_path
 class Game:
     """ 
     Game class to handle game logic and state.
@@ -72,9 +72,7 @@ class Game:
 
                     #all pieces except dragged piece
                     if piece is not self.dragger.piece: 
-                        #draw piece
-                        piece.set_texture(size=80)
-                        image = pygame.image.load(piece.texture)
+                        image = asset_cache.image(piece_texture_path(piece, 80))
                         image_center  = col * SQSIZE + SQSIZE//2, row * SQSIZE + SQSIZE//2
                         piece.texture_rect = image.get_rect(center=image_center)    
                         surface.blit(image, piece.texture_rect)
@@ -94,8 +92,6 @@ class Game:
             for move in piece.moves:
                 #color of move
                 color = theme.moves.light if (move.final.row + move.final.col) % 2 == 0 else theme.moves.dark
-
-                color = LIGHT_GREEN if (move.final.row + move.final.col) % 2 == 0 else DARK_GREEN
                 rect = (move.final.col*SQSIZE, move.final.row*SQSIZE, SQSIZE, SQSIZE)
 
                 #draw move / blit
@@ -115,8 +111,6 @@ class Game:
 
             for pos in [initial , final]:
                 color = theme.trace.light if (pos.row + pos.col) % 2 == 0 else theme.trace.dark
-                #color of move
-                color = (228, 245, 154) if (pos.row + pos.col) % 2 == 0 else (236, 247, 186)
                 rect = (pos.col*SQSIZE, pos.row*SQSIZE, SQSIZE, SQSIZE)
 
                 #draw move / blit
@@ -142,3 +136,10 @@ class Game:
 
     def reset(self):
         self.__init__()
+
+    def render(self, surface):
+        self.show_background(surface)
+        self.show_last_moves(surface)
+        self.show_moves(surface)
+        self.show_pieces(surface)
+        self.show_hover(surface)

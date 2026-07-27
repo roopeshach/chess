@@ -27,4 +27,6 @@ class Move:
     def __eq__(self, other):
         """Overrides the default implementation"""
 
+        if not isinstance(other, Move):
+            return False
         return self.initial == other.initial and self.final == other.final

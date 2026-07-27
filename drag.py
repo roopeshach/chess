@@ -1,5 +1,6 @@
 import pygame
 from const import *
+from asset_cache import asset_cache, piece_texture_path
 
 class Dragger:
 
@@ -65,11 +66,7 @@ class Dragger:
         Args:
             surface (pygame.Surface): The surface to draw the piece on.
         """
-        #texture 
-        self.piece.set_texture(size=120)
-        texture = self.piece.texture
-        #image 
-        image = pygame.image.load(texture)
+        image = asset_cache.image(piece_texture_path(self.piece, 120))
 
         #rectangles
         image_center = (self.mouseX, self.mouseY)
