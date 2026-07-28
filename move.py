@@ -2,7 +2,7 @@
 
 class Move:
 
-    def __init__(self, initial , final):
+    def __init__(self, initial, final) -> None:
         """A move from initial square to final square.
         Args:
             initial (Square): The initial square.
@@ -12,7 +12,7 @@ class Move:
         self.initial = initial
         self.final = final
         
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Returns:
             str: A string representation of the move.
@@ -24,10 +24,10 @@ class Move:
         s += f' -> ({self.final.col}, {self.final.row})'
         return s
 
-    def notation(self):
+    def notation(self) -> str:
         return f"{self.initial.alphacol}{8 - self.initial.row}{self.final.alphacol}{8 - self.final.row}"
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """Overrides the default implementation"""
 
         if not isinstance(other, Move):

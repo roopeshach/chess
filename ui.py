@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 import pygame
 
 
 class Button:
-    def __init__(self, rect, text):
+    def __init__(self, rect: tuple[int, int, int, int], text: str) -> None:
         self.rect = pygame.Rect(rect)
         self.text = text
 
-    def draw(self, surface, font, mouse_pos):
+    def draw(self, surface: pygame.Surface, font: pygame.font.Font, mouse_pos: tuple[int, int]) -> None:
         hovered = self.rect.collidepoint(mouse_pos)
         bg = (40, 46, 54) if hovered else (28, 33, 40)
         border = (83, 92, 104) if hovered else (57, 64, 74)
@@ -16,18 +18,18 @@ class Button:
         label = font.render(self.text, True, (245, 246, 250))
         surface.blit(label, label.get_rect(center=self.rect.center))
 
-    def clicked(self, event):
+    def clicked(self, event: pygame.event.Event) -> bool:
         return event.type == pygame.MOUSEBUTTONDOWN and self.rect.collidepoint(event.pos)
 
 
 class TextInput:
-    def __init__(self, rect, placeholder=""):
+    def __init__(self, rect: tuple[int, int, int, int], placeholder: str = "") -> None:
         self.rect = pygame.Rect(rect)
         self.placeholder = placeholder
         self.value = ""
         self.active = True
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event) -> bool:
         if event.type == pygame.MOUSEBUTTONDOWN:
             self.active = self.rect.collidepoint(event.pos)
             return False
@@ -44,7 +46,7 @@ class TextInput:
 
         return False
 
-    def draw(self, surface, font):
+    def draw(self, surface: pygame.Surface, font: pygame.font.Font) -> None:
         border = (82, 160, 255) if self.active else (80, 86, 96)
         pygame.draw.rect(surface, (22, 26, 32), self.rect, border_radius=6)
         pygame.draw.rect(surface, border, self.rect, width=2, border_radius=6)
@@ -55,6 +57,12 @@ class TextInput:
         surface.blit(label, (self.rect.x + 14, self.rect.y + 13))
 
 
-def draw_text(surface, text, font, pos, color=(245, 246, 250)):
+def draw_text(
+    surface: pygame.Surface,
+    text: str,
+    font: pygame.font.Font,
+    pos: tuple[int, int],
+    color: tuple[int, int, int] = (245, 246, 250),
+) -> None:
     label = font.render(text, True, color)
     surface.blit(label, pos)

@@ -1,48 +1,17 @@
 import random
-from dataclasses import dataclass
 
+from models import Challenge, PieceSpec
 from piece import Bishop, King, Knight, Pawn, Queen, Rook
 
 
 FILES = "abcdefgh"
 
 
-@dataclass(frozen=True)
-class PieceSpec:
-    row: int
-    col: int
-    piece_cls: type
-    color: str
-
-    def create_piece(self):
-        return self.piece_cls(self.color)
-
-
-@dataclass(frozen=True)
-class Challenge:
-    title: str
-    objective: str
-    pieces: tuple
-    target_moves: tuple
-
-    def apply(self, board):
-        for _, _, square in board.iter_squares():
-            square.piece = None
-
-        for spec in self.pieces:
-            board.squares[spec.row][spec.col].piece = spec.create_piece()
-
-        board.last_move = None
-
-    def completed_by(self, move):
-        return move.notation() in self.target_moves
-
-
-def notation(initial, final):
+def notation(initial: tuple[int, int], final: tuple[int, int]) -> str:
     return f"{FILES[initial[1]]}{8 - initial[0]}{FILES[final[1]]}{8 - final[0]}"
 
 
-def base_pieces(extra):
+def base_pieces(extra: tuple[PieceSpec, ...]) -> tuple[PieceSpec, ...]:
     occupied = {(spec.row, spec.col) for spec in extra}
     white_king = next(
         pos for pos in ((7, 4), (7, 7), (7, 0), (6, 4)) if pos not in occupied
@@ -51,28 +20,34 @@ def base_pieces(extra):
         pos for pos in ((0, 4), (0, 0), (0, 7), (1, 4)) if pos not in occupied
     )
     return (
-        PieceSpec(white_king[0], white_king[1], King, "white"),
-        PieceSpec(black_king[0], black_king[1], King, "black"),
+        PieceSpec(row=white_king[0], col=white_king[1], piece_cls=King, color="white"),
+        PieceSpec(row=black_king[0], col=black_king[1], piece_cls=King, color="black"),
         *extra,
     )
 
 
-def challenge(title, objective, mover, target, target_piece):
+def challenge(
+    title: str,
+    objective: str,
+    mover: tuple[int, int, type],
+    target: tuple[int, int],
+    target_piece: type,
+) -> Challenge:
     return Challenge(
         title=title,
         objective=objective,
         pieces=base_pieces(
             (
-                PieceSpec(mover[0], mover[1], mover[2], "white"),
-                PieceSpec(target[0], target[1], target_piece, "black"),
+                PieceSpec(row=mover[0], col=mover[1], piece_cls=mover[2], color="white"),
+                PieceSpec(row=target[0], col=target[1], piece_cls=target_piece, color="black"),
             )
         ),
         target_moves=(notation(mover, target),),
     )
 
 
-def rook_challenges(limit=25):
-    items = []
+def rook_challenges(limit: int = 25) -> list[Challenge]:
+    items: list[Challenge] = []
     lanes = ((0, 7), (7, 0), (1, 6), (6, 1), (2, 5))
     for row in range(1, 6):
         for source_col, target_col in lanes:
@@ -90,9 +65,9 @@ def rook_challenges(limit=25):
     return items
 
 
-def bishop_challenges(limit=25):
-    items = []
-    used = set()
+def bishop_challenges(limit: int = 25) -> list[Challenge]:
+    items: list[Challenge] = []
+    used: set[tuple[int, int, int, int]] = set()
     for source_row in range(2, 8):
         for source_col in range(0, 8):
             for row_step, col_step in ((-1, 1), (-1, -1)):
@@ -120,8 +95,8 @@ def bishop_challenges(limit=25):
     return items
 
 
-def knight_challenges(limit=25):
-    items = []
+def knight_challenges(limit: int = 25) -> list[Challenge]:
+    items: list[Challenge] = []
     offsets = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
     for source_row in range(2, 7):
         for source_col in range(1, 7):
@@ -146,8 +121,8 @@ def knight_challenges(limit=25):
     return items
 
 
-def queen_challenges(limit=25):
-    items = []
+def queen_challenges(limit: int = 25) -> list[Challenge]:
+    items: list[Challenge] = []
     lines = (
         ((6, 0), (1, 5)),
         ((6, 7), (1, 2)),
@@ -176,17 +151,17 @@ def queen_challenges(limit=25):
     return items
 
 
-def promotion_pieces(col):
+def promotion_pieces(col: int) -> tuple[PieceSpec, ...]:
     black_king_col = 7 if col == 0 else 0
     return (
-        PieceSpec(7, 4, King, "white"),
-        PieceSpec(0, black_king_col, King, "black"),
-        PieceSpec(1, col, Pawn, "white"),
+        PieceSpec(row=7, col=4, piece_cls=King, color="white"),
+        PieceSpec(row=0, col=black_king_col, piece_cls=King, color="black"),
+        PieceSpec(row=1, col=col, piece_cls=Pawn, color="white"),
     )
 
 
-def promotion_challenges(limit=8):
-    items = []
+def promotion_challenges(limit: int = 8) -> list[Challenge]:
+    items: list[Challenge] = []
     for col in range(8):
         items.append(
             Challenge(
@@ -201,7 +176,7 @@ def promotion_challenges(limit=8):
     return items
 
 
-CHALLENGES = tuple(
+CHALLENGES: tuple[Challenge, ...] = tuple(
     rook_challenges()
     + bishop_challenges()
     + knight_challenges()
@@ -210,5 +185,5 @@ CHALLENGES = tuple(
 )
 
 
-def random_challenge():
+def random_challenge() -> Challenge:
     return random.choice(CHALLENGES)

@@ -1,17 +1,20 @@
 import json
 import sqlite3
 from datetime import datetime
+from typing import Mapping, Sequence
+
+from models import ChallengeAttempt, ChallengeResult, GameRecord, MoveRecord, UserProfile
 
 
 class GameStorage:
-    def __init__(self, path="chess_history.db"):
+    def __init__(self, path: str = "chess_history.db") -> None:
         self.path = path
         self._init_db()
 
-    def _connect(self):
+    def _connect(self) -> sqlite3.Connection:
         return sqlite3.connect(self.path)
 
-    def _init_db(self):
+    def _init_db(self) -> None:
         with self._connect() as conn:
             conn.execute(
                 """
@@ -48,7 +51,7 @@ class GameStorage:
                 """
             )
 
-    def get_or_create_user(self, username):
+    def get_or_create_user(self, username: str) -> UserProfile:
         username = username.strip() or "Guest"
         now = datetime.utcnow().isoformat(timespec="seconds")
 
@@ -62,11 +65,21 @@ class GameStorage:
                 (username,),
             ).fetchone()
 
-        return {"id": row[0], "username": row[1]}
+        return UserProfile(id=row[0], username=row[1])
 
-    def save_game(self, user_id, result, moves):
+    def save_game(
+        self,
+        user_id: int,
+        result: str,
+        moves: Sequence[MoveRecord | Mapping[str, object]],
+    ) -> None:
         if not moves:
             return
+
+        move_records = [
+            move if isinstance(move, MoveRecord) else MoveRecord.model_validate(move)
+            for move in moves
+        ]
 
         with self._connect() as conn:
             conn.execute(
@@ -77,12 +90,12 @@ class GameStorage:
                 (
                     user_id,
                     result,
-                    json.dumps(moves),
+                    json.dumps([move.model_dump() for move in move_records]),
                     datetime.utcnow().isoformat(timespec="seconds"),
                 ),
             )
 
-    def recent_games(self, user_id, limit=10):
+    def recent_games(self, user_id: int, limit: int = 10) -> list[GameRecord]:
         with self._connect() as conn:
             rows = conn.execute(
                 """
@@ -96,15 +109,21 @@ class GameStorage:
             ).fetchall()
 
         return [
-            {
-                "result": result,
-                "moves": json.loads(moves),
-                "created_at": created_at,
-            }
+            GameRecord(
+                result=result,
+                moves=[MoveRecord.model_validate(move) for move in json.loads(moves)],
+                created_at=created_at,
+            )
             for result, moves, created_at in rows
         ]
 
-    def save_challenge(self, user_id, title, result, move):
+    def save_challenge(self, user_id: int, title: str, result: ChallengeResult, move: str) -> None:
+        attempt = ChallengeAttempt(
+            title=title,
+            result=result,
+            move=move,
+            created_at=datetime.utcnow().isoformat(timespec="seconds"),
+        )
         with self._connect() as conn:
             conn.execute(
                 """
@@ -113,14 +132,14 @@ class GameStorage:
                 """,
                 (
                     user_id,
-                    title,
-                    result,
-                    move,
-                    datetime.utcnow().isoformat(timespec="seconds"),
+                    attempt.title,
+                    attempt.result,
+                    attempt.move,
+                    attempt.created_at,
                 ),
             )
 
-    def recent_challenges(self, user_id, limit=10):
+    def recent_challenges(self, user_id: int, limit: int = 10) -> list[ChallengeAttempt]:
         with self._connect() as conn:
             rows = conn.execute(
                 """
@@ -134,16 +153,16 @@ class GameStorage:
             ).fetchall()
 
         return [
-            {
-                "title": title,
-                "result": result,
-                "move": move,
-                "created_at": created_at,
-            }
+            ChallengeAttempt(
+                title=title,
+                result=result,
+                move=move,
+                created_at=created_at,
+            )
             for title, result, move, created_at in rows
         ]
 
-    def learned_replies(self, user_id=None):
+    def learned_replies(self, user_id: int | None = None) -> dict[str, dict[str, int]]:
         with self._connect() as conn:
             if user_id:
                 rows = conn.execute(
@@ -155,10 +174,10 @@ class GameStorage:
 
         replies = {}
         for (moves_json,) in rows:
-            moves = json.loads(moves_json)
+            moves = [MoveRecord.model_validate(move) for move in json.loads(moves_json)]
             for index in range(0, len(moves) - 1, 2):
-                player_move = moves[index]["notation"]
-                ai_reply = moves[index + 1]["notation"]
+                player_move = moves[index].notation
+                ai_reply = moves[index + 1].notation
                 replies.setdefault(player_move, {})
                 replies[player_move][ai_reply] = replies[player_move].get(ai_reply, 0) + 1
 

@@ -1,6 +1,7 @@
 import pygame
 from const import *
 from asset_cache import asset_cache, piece_texture_path
+from piece import Piece
 
 class Dragger:
 
@@ -20,15 +21,15 @@ class Dragger:
     """
 
 
-    def __init__(self):
-        self.piece = None
+    def __init__(self) -> None:
+        self.piece: Piece | None = None
         self.dragging = False
         self.mouseX  = 0
         self.mouseY  = 0
         self.initial_row = 0
         self.initial_col = 0
 
-    def update_mouse(self, pos):
+    def update_mouse(self, pos: tuple[int, int]) -> None:
         """Update the position of the mouse.
         Args:
             pos (tuple): The position of the mouse.
@@ -36,7 +37,7 @@ class Dragger:
 
         self.mouseX, self.mouseY = pos # pos is a tuple of (x, y)
 
-    def save_initial(self, pos):
+    def save_initial(self, pos: tuple[int, int]) -> None:
         """Save the initial position of the piece being dragged.
         Args:
             pos (tuple): The initial position of the piece being dragged.
@@ -45,7 +46,7 @@ class Dragger:
         self.initial_row = pos[1] // SQSIZE
         self.initial_col = pos[0] // SQSIZE
 
-    def drag_piece(self,piece):
+    def drag_piece(self, piece: Piece) -> None:
         """Set the piece being dragged.
 
         Args:
@@ -54,18 +55,21 @@ class Dragger:
         self.piece = piece
         self.dragging = True
     
-    def drop_piece(self):
+    def drop_piece(self) -> None:
         """Drop the piece being dragged.
         """
         self.piece = None
         self.dragging = False
 
     #blit method
-    def update_blit(self, surface):
+    def update_blit(self, surface: pygame.Surface) -> None:
         """Update the position of the piece being dragged.
         Args:
             surface (pygame.Surface): The surface to draw the piece on.
         """
+        if self.piece is None:
+            return
+
         image = asset_cache.image(piece_texture_path(self.piece, 120))
 
         #rectangles
@@ -75,7 +79,7 @@ class Dragger:
         #blit
         surface.blit(image, self.piece.texture_rect)
 
-    def update(self, surface):
+    def update(self, surface: pygame.Surface) -> None:
         """Update the position of the piece being dragged.
         Args:
             surface (pygame.Surface): The surface to draw the piece on.

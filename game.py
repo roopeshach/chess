@@ -5,23 +5,28 @@ from drag import Dragger
 from config import Config
 from square import Square
 from asset_cache import asset_cache, piece_texture_path
+from models import MovePlayer, MoveRecord
+from move import Move
+from piece import Piece
+
+
 class Game:
     """ 
     Game class to handle game logic and state.
         
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.next_player = 'white'
         self.hovered_square = None
         self.board = Board()
         self.dragger = Dragger()
         self.config = Config()
-        self.move_history = []
+        self.move_history: list[MoveRecord] = []
 
     #show methods  to draw board and pieces
 
-    def show_background(self, surface):
+    def show_background(self, surface: pygame.Surface) -> None:
         """Draw the background of the board.
         Args:
             surface (pygame.Surface): The surface to draw on.
@@ -58,7 +63,7 @@ class Game:
                     surface.blit(label, label_pos)
                 
 
-    def show_pieces(self, surface):
+    def show_pieces(self, surface: pygame.Surface) -> None:
         """Draw the pieces on the board.
         Args:
             surface (pygame.Surface): The surface to draw on.
@@ -79,12 +84,12 @@ class Game:
                         surface.blit(image, piece.texture_rect)
         
 
-    def show(self, surface):
+    def show(self, surface: pygame.Surface) -> None:
         self.show_background(surface)
         self.show_pieces(surface)
 
     
-    def show_moves(self, surface):
+    def show_moves(self, surface: pygame.Surface) -> None:
         theme = self.config.theme
         if self.dragger.dragging:
             piece = self.dragger.piece
@@ -98,12 +103,12 @@ class Game:
                 #draw move / blit
                 pygame.draw.rect(surface, color, rect)
     
-    def next_turn(self):
+    def next_turn(self) -> None:
         """Change the current player."""
         self.next_player = 'white' if self.next_player == 'black' else 'black'
 
         
-    def show_last_moves(self, surface):
+    def show_last_moves(self, surface: pygame.Surface) -> None:
         theme = self.config.theme
         if self.board.last_move:
             initial = self.board.last_move.initial
@@ -116,43 +121,43 @@ class Game:
                 #draw move / blit
                 pygame.draw.rect(surface, color, rect)
 
-    def set_hover(self, row, col):
+    def set_hover(self, row: int, col: int) -> None:
         self.hovered_square = self.board.squares[row][col]
 
-    def show_hover(self, surface):
+    def show_hover(self, surface: pygame.Surface) -> None:
         if self.hovered_square:
             color = (180, 180, 180)
             rect = (self.hovered_square.col*SQSIZE, self.hovered_square.row*SQSIZE, SQSIZE, SQSIZE)
             pygame.draw.rect(surface, color, rect, width=2)
     
-    def change_theme(self):
+    def change_theme(self) -> None:
         self.config.change_theme()
 
-    def play_sound(self, captured=False):
+    def play_sound(self, captured: bool = False) -> None:
         if captured:
             self.config.capture_sound.play_sound()
         else:
             self.config.move_sound.play_sound()     
 
-    def reset(self):
+    def reset(self) -> None:
         self.__init__()
 
-    def apply_move(self, piece, move, player):
+    def apply_move(self, piece: Piece, move: Move, player: MovePlayer) -> bool:
         captured_piece = self.board.move(piece, move)
         captured = captured_piece is not None
         self.move_history.append(
-            {
-                "player": player,
-                "piece": piece.name,
-                "notation": move.notation(),
-                "captured": captured,
-            }
+            MoveRecord(
+                player=player,
+                piece=piece.name,
+                notation=move.notation(),
+                captured=captured,
+            )
         )
         self.play_sound(captured)
         self.next_turn()
         return captured
 
-    def render(self, surface):
+    def render(self, surface: pygame.Surface) -> None:
         self.show_background(surface)
         self.show_last_moves(surface)
         self.show_moves(surface)

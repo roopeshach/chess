@@ -1,8 +1,9 @@
 from const import *
 from square import Square
-from piece import  Pawn, Rook, Knight, Bishop, Queen, King
+from piece import Piece, Pawn, Rook, Knight, Bishop, Queen, King
 from move import Move
 import copy
+from collections.abc import Iterator
 
 class Board:
     """A chess board.
@@ -12,7 +13,7 @@ class Board:
     """
 
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.squares = [[0, 0, 0, 0, 0, 0, 0, 0 ] for col in range(COLS)]
 
         self.last_move = None
@@ -21,7 +22,7 @@ class Board:
         self._add_pieces("black")
 
 
-    def _create(self):
+    def _create(self) -> None:
         """Create the board."""
         for row in range(ROWS):
             for col in range(COLS):
@@ -29,7 +30,7 @@ class Board:
                 # print(self.squares[row][col])
 
 
-    def _add_pieces(self, color):
+    def _add_pieces(self, color: str) -> None:
         """Add pieces to the board.     
         Args:
             color (str): The color of the pieces to add.
@@ -46,27 +47,27 @@ class Board:
         for col, piece_cls in enumerate(back_rank):
             self.squares[row_other][col] = Square(row_other, col, piece_cls(color))
     
-    def __str__(self):
+    def __str__(self) -> str:
         """Return a string representation of the board."""
         return f"Board({self.squares})"
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return a string representation of the board."""
         return f"Board({self.squares})"
 
-    def iter_squares(self):
+    def iter_squares(self) -> Iterator[tuple[int, int, Square]]:
         for row in range(ROWS):
             for col in range(COLS):
                 yield row, col, self.squares[row][col]
 
-    def iter_pieces(self):
+    def iter_pieces(self) -> Iterator[tuple[int, int, Piece]]:
         for row, col, square in self.iter_squares():
             if square.has_piece():
                 yield row, col, square.piece
 
     
  
-    def calc_moves(self, piece, row, col, bool=True):
+    def calc_moves(self, piece: Piece, row: int, col: int, bool: bool = True) -> None:
         '''
         Calculate the possible moves for a piece in specific square
         
@@ -323,7 +324,7 @@ class Board:
         else: raise ValueError("Invalid piece")
 
 
-    def move(self, piece, move, testing=False):
+    def move(self, piece: Piece, move: Move, testing: bool = False) -> Piece | None:
         initial = move.initial
         final = move.final
 
@@ -377,16 +378,16 @@ class Board:
 
         return captured_piece
 
-    def valid_move(self, piece, move):
+    def valid_move(self, piece: Piece, move: Move) -> bool:
         return move in piece.moves
     
-    def castling(self, initial, final):
+    def castling(self, initial: Square, final: Square) -> bool:
         return abs(initial.col - final.col) == 2
     
-    def pawn_double_step(self, piece, move):
+    def pawn_double_step(self, piece: Piece, move: Move) -> bool:
         return isinstance(piece, Pawn) and abs(move.initial.row - move.final.row) == 2
 
-    def enpassant(self, piece, move):
+    def enpassant(self, piece: Piece, move: Move) -> bool:
         if not isinstance(piece, Pawn):
             return False
 
@@ -394,25 +395,25 @@ class Board:
         empty_destination = self.squares[move.final.row][move.final.col].is_empty()
         return diagonal_move and empty_destination
 
-    def set_false_enpassant(self, except_piece=None):
+    def set_false_enpassant(self, except_piece: Piece | None = None) -> None:
         for _, _, board_piece in self.iter_pieces():
             if isinstance(board_piece, Pawn) and board_piece is not except_piece:
                 board_piece.en_passant = False
 
-    def set_true_enpassant(self, piece, move=None):
+    def set_true_enpassant(self, piece: Piece, move: Move | None = None) -> None:
         move = move or self.last_move
         if not move or not self.pawn_double_step(piece, move):
             return
 
         piece.en_passant = True
 
-    def update_enpassant(self, piece, move):
+    def update_enpassant(self, piece: Piece, move: Move) -> None:
         self.set_false_enpassant(except_piece=piece)
         if isinstance(piece, Pawn):
             piece.en_passant = False
         self.set_true_enpassant(piece, move)
 
-    def in_check(self, piece, move):
+    def in_check(self, piece: Piece, move: Move) -> bool:
         temp_piece = copy.deepcopy(piece)
         temp_board = copy.deepcopy(self)
         temp_board.move(temp_piece, move,testing=True)
@@ -430,6 +431,6 @@ class Board:
 
 
     
-    def check_promotion(self, piece, final):
+    def check_promotion(self, piece: Piece, final: Square) -> None:
         if final.row == 0 or final.row == 7:
             self.squares[final.row][final.col].piece = Queen(piece.color)
