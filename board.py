@@ -327,7 +327,8 @@ class Board:
         initial = move.initial
         final = move.final
 
-        enpassant_empty = self.squares[final.row][final.col].is_empty()
+        captured_piece = self.squares[final.row][final.col].piece
+        enpassant = self.enpassant(piece, move)
 
         # #console board move update
         self.squares[initial.row][initial.col].piece = None
@@ -340,8 +341,9 @@ class Board:
         if isinstance(piece, Pawn):
             #enpassant capture
             diff = final.col - initial.col
-            if diff !=0 and enpassant_empty:
+            if enpassant:
                 #console board move update
+                captured_piece = self.squares[initial.row][initial.col + diff].piece
                 self.squares[initial.row][initial.col + diff].piece = None
                 self.squares[final.row][final.col].piece = piece
             
@@ -370,34 +372,45 @@ class Board:
         #set last move
         self.last_move = move
 
+        if not testing:
+            self.update_enpassant(piece, move)
+
+        return captured_piece
+
     def valid_move(self, piece, move):
         return move in piece.moves
     
     def castling(self, initial, final):
         return abs(initial.col - final.col) == 2
     
-    # def enpassant(self, initial, final):
-    #     return abs(initial.row - final.row) == 2
-    
-    # def set_false_enpassant(self):
-    #     for row in range(ROWS):
-    #         for col in range(COLS):
-    #             if isinstance(self.squares[row][col].piece, Pawn):
-    #                 pawn = self.squares[row][col].piece
-    #                 if self.last_move:
-    #                     if self.last_move.final.piece != pawn:
-    #                         pawn.en_passant = False
+    def pawn_double_step(self, piece, move):
+        return isinstance(piece, Pawn) and abs(move.initial.row - move.final.row) == 2
 
-    
-    def set_true_enpassant(self, piece):
+    def enpassant(self, piece, move):
+        if not isinstance(piece, Pawn):
+            return False
+
+        diagonal_move = move.initial.col != move.final.col
+        empty_destination = self.squares[move.final.row][move.final.col].is_empty()
+        return diagonal_move and empty_destination
+
+    def set_false_enpassant(self, except_piece=None):
         for _, _, board_piece in self.iter_pieces():
-            if isinstance(board_piece, Pawn):
+            if isinstance(board_piece, Pawn) and board_piece is not except_piece:
                 board_piece.en_passant = False
 
-        if not isinstance(piece, Pawn) or not self.last_move:
+    def set_true_enpassant(self, piece, move=None):
+        move = move or self.last_move
+        if not move or not self.pawn_double_step(piece, move):
             return
 
-        piece.en_passant = abs(self.last_move.initial.row - self.last_move.final.row) == 2
+        piece.en_passant = True
+
+    def update_enpassant(self, piece, move):
+        self.set_false_enpassant(except_piece=piece)
+        if isinstance(piece, Pawn):
+            piece.en_passant = False
+        self.set_true_enpassant(piece, move)
 
     def in_check(self, piece, move):
         temp_piece = copy.deepcopy(piece)

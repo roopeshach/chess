@@ -138,9 +138,8 @@ class Game:
         self.__init__()
 
     def apply_move(self, piece, move, player):
-        captured = self.board.squares[move.final.row][move.final.col].has_piece()
-        self.board.move(piece, move)
-        self.board.set_true_enpassant(piece)
+        captured_piece = self.board.move(piece, move)
+        captured = captured_piece is not None
         self.move_history.append(
             {
                 "player": player,

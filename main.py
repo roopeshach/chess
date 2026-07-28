@@ -4,6 +4,7 @@ import sys
 
 import pygame
 
+from challenges import random_challenge
 from const import HEIGHT, SQSIZE, WIDTH
 from game import Game
 from ml_player import LearningPlayer
@@ -17,6 +18,7 @@ LOGIN = "login"
 MENU = "menu"
 PLAY = "play"
 HISTORY = "history"
+CHALLENGE = "challenge"
 
 
 class Main:
@@ -32,6 +34,9 @@ class Main:
         self.game = Game()
         self.learning_player = LearningPlayer(self.storage)
         self.game_saved = False
+        self.challenge = None
+        self.challenge_result = ""
+        self.challenge_finished = False
 
         self.title_font = pygame.font.SysFont("monospace", 48, bold=True)
         self.heading_font = pygame.font.SysFont("monospace", 30, bold=True)
@@ -40,11 +45,13 @@ class Main:
 
         self.username_input = TextInput((210, 355, 380, 52), "Username")
         self.login_button = Button((300, 430, 200, 52), "Login")
-        self.play_button = Button((270, 310, 260, 56), "Play vs ML")
-        self.history_button = Button((270, 385, 260, 56), "Last Games")
-        self.logout_button = Button((270, 460, 260, 56), "Logout")
+        self.play_button = Button((270, 280, 260, 52), "Play vs ML")
+        self.challenge_button = Button((270, 350, 260, 52), "Challenges")
+        self.history_button = Button((270, 420, 260, 52), "Last Games")
+        self.logout_button = Button((270, 490, 260, 52), "Logout")
         self.back_button = Button((32, 720, 150, 44), "Back")
         self.new_game_button = Button((610, 18, 160, 38), "New Game")
+        self.next_challenge_button = Button((590, 18, 180, 38), "Next")
 
     def mainloop(self):
         while self.running:
@@ -61,6 +68,8 @@ class Main:
                     self.handle_play_event(event)
                 elif self.state == HISTORY:
                     self.handle_history_event(event)
+                elif self.state == CHALLENGE:
+                    self.handle_challenge_event(event)
 
             pygame.display.update()
 
@@ -73,6 +82,8 @@ class Main:
             self.render_play()
         elif self.state == HISTORY:
             self.render_history()
+        elif self.state == CHALLENGE:
+            self.render_challenge()
 
     def render_panel_background(self):
         self.screen.fill((15, 18, 24))
@@ -94,6 +105,7 @@ class Main:
         draw_text(self.screen, "Home", self.title_font, (335, 145))
         draw_text(self.screen, f"Signed in as {username}", self.font, (285, 230), (186, 194, 205))
         self.play_button.draw(self.screen, self.font, mouse_pos)
+        self.challenge_button.draw(self.screen, self.font, mouse_pos)
         self.history_button.draw(self.screen, self.font, mouse_pos)
         self.logout_button.draw(self.screen, self.font, mouse_pos)
 
@@ -130,7 +142,32 @@ class Main:
                 draw_text(self.screen, moves, self.small_font, (90, y + 28), (186, 194, 205))
                 y += 72
 
+        challenges = self.storage.recent_challenges(self.user["id"], limit=4)
+        if challenges:
+            draw_text(self.screen, "Challenges", self.heading_font, (70, 575))
+            y = 620
+            for challenge in challenges:
+                text = f"{challenge['created_at']} - {challenge['title']} - {challenge['result']} ({challenge['move']})"
+                draw_text(self.screen, text, self.small_font, (90, y), (186, 194, 205))
+                y += 28
+
         self.back_button.draw(self.screen, self.font, mouse_pos)
+
+    def render_challenge(self):
+        self.game.render(self.screen)
+        mouse_pos = pygame.mouse.get_pos()
+        self.next_challenge_button.draw(self.screen, self.small_font, mouse_pos)
+        self.back_button.draw(self.screen, self.small_font, mouse_pos)
+
+        title = self.challenge.title if self.challenge else "Challenge"
+        objective = self.challenge.objective if self.challenge else ""
+        draw_text(self.screen, title, self.small_font, (18, 16), (20, 24, 30))
+        draw_text(self.screen, objective, self.small_font, (18, 42), (20, 24, 30))
+        if self.challenge_result:
+            draw_text(self.screen, self.challenge_result, self.small_font, (18, 68), (20, 24, 30))
+
+        if self.game.dragger.dragging:
+            self.game.dragger.update_blit(self.screen)
 
     def handle_login_event(self, event):
         submitted = self.username_input.handle_event(event)
@@ -141,6 +178,8 @@ class Main:
     def handle_menu_event(self, event):
         if self.play_button.clicked(event):
             self.start_new_game()
+        elif self.challenge_button.clicked(event):
+            self.start_challenge()
         elif self.history_button.clicked(event):
             self.state = HISTORY
         elif self.logout_button.clicked(event):
@@ -225,6 +264,72 @@ class Main:
 
             dragger.drop_piece()
 
+    def handle_challenge_event(self, event):
+        game = self.game
+        board = game.board
+        dragger = game.dragger
+
+        if self.next_challenge_button.clicked(event):
+            self.start_challenge()
+            return
+        if self.back_button.clicked(event):
+            self.state = MENU
+            return
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                self.state = MENU
+            elif event.key == pygame.K_r:
+                self.start_challenge()
+            elif event.key == pygame.K_t:
+                game.change_theme()
+            elif event.key == pygame.K_q:
+                self.quit()
+            return
+
+        if self.challenge_finished or game.next_player != "white":
+            return
+
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            dragger.update_mouse(event.pos)
+            row, col = self.board_position(event.pos)
+            if row is None:
+                return
+
+            square = board.squares[row][col]
+            if square.has_piece() and square.piece.color == "white":
+                piece = square.piece
+                piece.clear_moves()
+                board.calc_moves(piece, row, col, bool=True)
+                dragger.save_initial(event.pos)
+                dragger.drag_piece(piece)
+
+        elif event.type == pygame.MOUSEMOTION:
+            row, col = self.board_position(event.pos)
+            if row is not None:
+                game.set_hover(row, col)
+            if dragger.dragging:
+                dragger.update_mouse(event.pos)
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if not dragger.dragging:
+                return
+
+            dragger.update_mouse(event.pos)
+            row, col = self.board_position(event.pos)
+            if row is not None:
+                move = Move(
+                    Square(dragger.initial_row, dragger.initial_col),
+                    Square(row, col),
+                )
+                if board.valid_move(dragger.piece, move):
+                    game.apply_move(dragger.piece, move, "user")
+                    self.finish_challenge(move)
+                    dragger.drop_piece()
+                    return
+
+            dragger.drop_piece()
+
     def play_learning_move(self, last_user_move):
         if self.game.next_player != "black":
             return
@@ -249,6 +354,26 @@ class Main:
         self.learning_player = LearningPlayer(self.storage, self.user["id"])
         self.game_saved = False
         self.state = PLAY
+
+    def start_challenge(self):
+        self.game = Game()
+        self.challenge = random_challenge()
+        self.challenge.apply(self.game.board)
+        self.challenge_result = ""
+        self.challenge_finished = False
+        self.state = CHALLENGE
+
+    def finish_challenge(self, move):
+        success = self.challenge.completed_by(move)
+        result = "completed" if success else "missed"
+        self.challenge_result = "Correct. Press Next for another." if success else "Missed. Press R to retry or Next."
+        self.challenge_finished = True
+        self.storage.save_challenge(
+            self.user["id"],
+            self.challenge.title,
+            result,
+            move.notation(),
+        )
 
     def finish_current_game(self, result):
         if self.user and not self.game_saved and self.game.move_history:

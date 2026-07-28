@@ -34,6 +34,19 @@ class GameStorage:
                 )
                 """
             )
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS challenges (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER NOT NULL,
+                    title TEXT NOT NULL,
+                    result TEXT NOT NULL,
+                    move TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(user_id) REFERENCES users(id)
+                )
+                """
+            )
 
     def get_or_create_user(self, username):
         username = username.strip() or "Guest"
@@ -89,6 +102,45 @@ class GameStorage:
                 "created_at": created_at,
             }
             for result, moves, created_at in rows
+        ]
+
+    def save_challenge(self, user_id, title, result, move):
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO challenges (user_id, title, result, move, created_at)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (
+                    user_id,
+                    title,
+                    result,
+                    move,
+                    datetime.utcnow().isoformat(timespec="seconds"),
+                ),
+            )
+
+    def recent_challenges(self, user_id, limit=10):
+        with self._connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT title, result, move, created_at
+                FROM challenges
+                WHERE user_id = ?
+                ORDER BY id DESC
+                LIMIT ?
+                """,
+                (user_id, limit),
+            ).fetchall()
+
+        return [
+            {
+                "title": title,
+                "result": result,
+                "move": move,
+                "created_at": created_at,
+            }
+            for title, result, move, created_at in rows
         ]
 
     def learned_replies(self, user_id=None):
